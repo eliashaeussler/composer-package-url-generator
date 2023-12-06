@@ -62,7 +62,7 @@ final class PackageUrlGenerator
     public static function create(Composer $composer): self
     {
         $urlGenerators = [
-            new Url\Generator\DefaultUrlGenerator(),
+            new Url\Generator\GenericUrlGenerator(),
         ];
 
         return new self($composer, $urlGenerators);
