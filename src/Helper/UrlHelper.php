@@ -27,9 +27,9 @@ use EliasHaeussler\ComposerPackageUrlGenerator\Exception;
 use GuzzleHttp\Psr7\Uri;
 use Psr\Http\Message;
 
+use function parse_url;
 use function preg_replace;
-use function str_starts_with;
-use function substr;
+use function str_contains;
 
 /**
  * UriHelper.
@@ -50,18 +50,28 @@ final class UrlHelper
             throw new Exception\UrlIsMalformed($url);
         }
 
-        if (str_starts_with($normalizedUrl, 'ssh://')) {
-            $httpUri = new Uri('https://'.substr($normalizedUrl, 6));
-
-            return $httpUri->withUserInfo('');
+        // Convert Git-style syntax to HTTPS syntax
+        // Example: git@gitlab.example.com:foo/bar => https://gitlab.example.com/foo/bar
+        if (!str_contains($normalizedUrl, '://')) {
+            $normalizedUrl = preg_replace('/^.+@([^:]+):/', 'https://$1/', $normalizedUrl);
         }
-
-        $normalizedUrl = preg_replace('/^.+@([^:]+):/', 'https://$1/', $normalizedUrl);
 
         if (null === $normalizedUrl) {
             throw new Exception\UrlIsMalformed($url);
         }
 
-        return new Uri($normalizedUrl);
+        if (false === parse_url($normalizedUrl)) {
+            throw new Exception\UrlIsMalformed($url);
+        }
+
+        $uri = new Uri($normalizedUrl);
+
+        // Enforce HTTPS scheme for SSH urls and missing url schemes
+        if ('' === $uri->getScheme() || 'ssh' === $uri->getScheme()) {
+            $uri = $uri->withScheme('https');
+        }
+
+        // Drop user info and port
+        return $uri->withUserInfo('')->withPort(null);
     }
 }
