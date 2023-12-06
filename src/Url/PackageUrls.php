@@ -29,7 +29,7 @@ use Psr\Http\Message;
 /**
  * PackageUrls.
  *
- * @author Elias Häußler <e.haeussler@familie-redlich.de>
+ * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
 final class PackageUrls
