@@ -26,7 +26,6 @@ namespace EliasHaeussler\ComposerPackageUrlGenerator\Url\Generator;
 use Composer\Package;
 use EliasHaeussler\ComposerPackageUrlGenerator\Exception;
 use EliasHaeussler\ComposerPackageUrlGenerator\Helper;
-use GuzzleHttp\Psr7;
 use Psr\Http\Message;
 
 /**
@@ -52,6 +51,9 @@ final class DefaultUrlGenerator implements UrlGenerator
         return Helper\UrlHelper::normalizeUrl($sourceUrl);
     }
 
+    /**
+     * @throws Exception\UrlIsMalformed
+     */
     public function generateHomepageUrl(Package\PackageInterface $package): ?Message\UriInterface
     {
         if (!($package instanceof Package\CompletePackageInterface)) {
@@ -59,7 +61,7 @@ final class DefaultUrlGenerator implements UrlGenerator
         }
 
         if (null !== ($homepageUrl = $package->getHomepage())) {
-            return new Psr7\Uri($homepageUrl);
+            return Helper\UrlHelper::normalizeUrl($homepageUrl);
         }
 
         return null;
