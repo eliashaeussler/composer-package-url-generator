@@ -49,7 +49,7 @@ final class DefaultUrlGenerator implements UrlGenerator
             throw new Exception\NoSourceUrlAvailable($package->getName());
         }
 
-        return Helper\UrlHelper::convertSshUrl($sourceUrl);
+        return Helper\UrlHelper::normalizeUrl($sourceUrl);
     }
 
     public function generateHomepageUrl(Package\PackageInterface $package): ?Message\UriInterface

@@ -42,7 +42,7 @@ final class UrlHelper
     /**
      * @throws Exception\UrlIsMalformed
      */
-    public static function convertSshUrl(string $url): Message\UriInterface
+    public static function normalizeUrl(string $url): Message\UriInterface
     {
         $normalizedUrl = preg_replace('/\.git\/?$/', '', $url);
 
