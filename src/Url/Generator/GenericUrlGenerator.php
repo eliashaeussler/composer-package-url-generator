@@ -42,13 +42,13 @@ final class GenericUrlGenerator implements UrlGenerator
      */
     public function generateSourceUrl(Package\PackageInterface $package): Message\UriInterface
     {
-        $sourceUrl = $package->getSourceUrl();
+        $sourceUrls = $package->getSourceUrls();
 
-        if (null === $sourceUrl) {
-            throw new Exception\NoSourceUrlAvailable($package->getName());
+        foreach ($sourceUrls as $sourceUrl) {
+            return Helper\UrlHelper::normalizeUrl($sourceUrl);
         }
 
-        return Helper\UrlHelper::normalizeUrl($sourceUrl);
+        throw new Exception\NoSourceUrlAvailable($package->getName());
     }
 
     /**

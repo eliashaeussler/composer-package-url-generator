@@ -41,6 +41,10 @@ use function str_contains;
  */
 final class GitHubUrlGenerator implements UrlGenerator
 {
+    /**
+     * @throws Exception\NoSourceUrlAvailable
+     * @throws Exception\UrlIsMalformed
+     */
     public function generateSourceUrl(Package\PackageInterface $package): Message\UriInterface
     {
         $candidates = [];
@@ -62,6 +66,9 @@ final class GitHubUrlGenerator implements UrlGenerator
         throw new Exception\NoSourceUrlAvailable($package->getName());
     }
 
+    /**
+     * @throws Exception\UrlIsMalformed
+     */
     public function generateHomepageUrl(Package\PackageInterface $package): ?Message\UriInterface
     {
         if ($package instanceof Package\CompletePackageInterface && null !== $package->getHomepage()) {
