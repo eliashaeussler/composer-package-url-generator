@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerPackageUrlGenerator\Url\Generator;
 
 use Composer\Package;
+use EliasHaeussler\ComposerPackageUrlGenerator\Exception;
 use Psr\Http\Message;
 
 /**
@@ -34,6 +35,9 @@ use Psr\Http\Message;
  */
 interface UrlGenerator
 {
+    /**
+     * @throws Exception\NoSourceUrlAvailable
+     */
     public function generateSourceUrl(Package\PackageInterface $package): Message\UriInterface;
 
     public function generateHomepageUrl(Package\PackageInterface $package): ?Message\UriInterface;
