@@ -51,7 +51,24 @@ final class PackageUrlGeneratorTest extends Framework\TestCase
         $this->subject = Src\PackageUrlGenerator::create($this->composer);
     }
 
-    // @todo Add test case for sorting of generators
+    #[Framework\Attributes\Test]
+    public function constructorSortsPackageUrlGeneratorsByPriority(): void
+    {
+        $package = self::createPackage('phpunit/phpunit');
+
+        $lowPriorityUrlGenerator = new Fixtures\DummyUrlGenerator();
+        $highPriorityUrlGenerator = new Fixtures\DummyHighPriorityUrlGenerator();
+
+        $subject = new Src\PackageUrlGenerator(
+            $this->composer,
+            [
+                $lowPriorityUrlGenerator,
+                $highPriorityUrlGenerator,
+            ],
+        );
+
+        self::assertSame($highPriorityUrlGenerator, $subject->findGeneratorForPackage($package));
+    }
 
     #[Framework\Attributes\Test]
     public function forPackageThrowsExceptionIfGivenPackageIsNotInstalled(): void
@@ -98,12 +115,22 @@ final class PackageUrlGeneratorTest extends Framework\TestCase
     public static function forPackageReturnsPackageUrlsForGivenPackageDataProvider(): Generator
     {
         $packageName = 'phpunit/phpunit';
-        $package = self::getComposer()->getRepositoryManager()->findPackage($packageName, new Semver\Constraint\MatchAllConstraint());
-
-        self::assertInstanceOf(Package\PackageInterface::class, $package);
+        $package = self::createPackage($packageName);
 
         yield 'package name' => [$packageName];
         yield 'package object' => [$package];
+    }
+
+    private static function createPackage(string $packageName): Package\PackageInterface
+    {
+        $package = self::getComposer()->getRepositoryManager()->findPackage(
+            $packageName,
+            new Semver\Constraint\MatchAllConstraint(),
+        );
+
+        self::assertInstanceOf(Package\PackageInterface::class, $package);
+
+        return $package;
     }
 
     private static function getComposer(): Composer
