@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "36f36580d50567015a0821bbbd3c68bb",
+    "content-hash": "adbf292a4621e159866413f6042d699a",
     "packages": [
         {
             "name": "guzzlehttp/psr7",
@@ -1150,38 +1150,39 @@
         },
         {
             "name": "eliashaeussler/rector-config",
-            "version": "2.0.1",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eliashaeussler/rector-config.git",
-                "reference": "5a98a3bee2e67a7c4c3cb7acb7821e7edeaeda7e"
+                "reference": "ea42e44c6f729d763a1362f163448d6146d28415"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eliashaeussler/rector-config/zipball/5a98a3bee2e67a7c4c3cb7acb7821e7edeaeda7e",
-                "reference": "5a98a3bee2e67a7c4c3cb7acb7821e7edeaeda7e",
+                "url": "https://api.github.com/repos/eliashaeussler/rector-config/zipball/ea42e44c6f729d763a1362f163448d6146d28415",
+                "reference": "ea42e44c6f729d763a1362f163448d6146d28415",
                 "shasum": ""
             },
             "require": {
                 "composer-runtime-api": "^2.0",
-                "php": "~8.1.0 || ~8.2.0 || ~8.3.0",
-                "rector/rector": "^0.15.21 || ^0.16.0 || ^0.17.0 || ^0.18.0"
+                "php": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
+                "rector/rector": "^1.2.9 || ^2.0"
             },
             "require-dev": {
                 "armin/editorconfig-cli": "^1.8 || ^2.0",
                 "composer/composer": "^2.0",
                 "eliashaeussler/php-cs-fixer-config": "^2.0",
-                "eliashaeussler/phpstan-config": "^2.0",
+                "eliashaeussler/phpstan-config": "^2.6",
+                "eliashaeussler/phpunit-attributes": "^1.0",
                 "ergebnis/composer-normalize": "^2.30",
+                "illuminate/container": "^10.39 || ^11.0",
                 "phpstan/extension-installer": "^1.2",
-                "phpunit/phpunit": "^10.1",
-                "ssch/typo3-rector": "^1.2",
+                "phpunit/phpunit": "^10.5.10 || ^11.0",
+                "ssch/typo3-rector": "^2.0 || ^3.0",
                 "symfony/config": "^5.4 || ^6.0 || ^7.0",
-                "symfony/dependency-injection": "^5.4 || ^6.0 || ^7.0",
-                "typo3/cms-core": "^12.4"
+                "typo3/cms-core": "^12.4 || ^13.0"
             },
             "suggest": {
-                "ssch/typo3-rector": "Configures additional Rector rules for TYPO3 CMS projects"
+                "ssch/typo3-rector": "Configures additional Rector rules for TYPO3 CMS projects (^2.0 || ^3.0)"
             },
             "type": "library",
             "autoload": {
@@ -1204,9 +1205,9 @@
             "description": "My personal configuration for Rector",
             "support": {
                 "issues": "https://github.com/eliashaeussler/rector-config/issues",
-                "source": "https://github.com/eliashaeussler/rector-config/tree/2.0.1"
+                "source": "https://github.com/eliashaeussler/rector-config/tree/3.1.0"
             },
-            "time": "2024-01-19T10:03:24+00:00"
+            "time": "2024-12-14T14:04:43+00:00"
         },
         {
             "name": "ergebnis/composer-normalize",
@@ -3629,27 +3630,30 @@
         },
         {
             "name": "rector/rector",
-            "version": "0.18.13",
+            "version": "1.2.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "f8011a76d36aa4f839f60f3b4f97707d97176618"
+                "reference": "40f9cf38c05296bd32f444121336a521a293fa61"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/f8011a76d36aa4f839f60f3b4f97707d97176618",
-                "reference": "f8011a76d36aa4f839f60f3b4f97707d97176618",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/40f9cf38c05296bd32f444121336a521a293fa61",
+                "reference": "40f9cf38c05296bd32f444121336a521a293fa61",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2|^8.0",
-                "phpstan/phpstan": "^1.10.35"
+                "phpstan/phpstan": "^1.12.5"
             },
             "conflict": {
                 "rector/rector-doctrine": "*",
                 "rector/rector-downgrade-php": "*",
                 "rector/rector-phpunit": "*",
                 "rector/rector-symfony": "*"
+            },
+            "suggest": {
+                "ext-dom": "To manipulate phpunit.xml via the custom-rule command"
             },
             "bin": [
                 "bin/rector"
@@ -3673,7 +3677,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/0.18.13"
+                "source": "https://github.com/rectorphp/rector/tree/1.2.10"
             },
             "funding": [
                 {
@@ -3681,7 +3685,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-12-20T16:08:01+00:00"
+            "time": "2024-11-08T13:59:10+00:00"
         },
         {
             "name": "sebastian/cli-parser",
