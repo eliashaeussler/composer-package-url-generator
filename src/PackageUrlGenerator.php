@@ -70,6 +70,7 @@ final class PackageUrlGenerator
     }
 
     /**
+     * @throws Exception\NoSourceUrlAvailable
      * @throws Exception\NoSupportedUrlGeneratorFound
      * @throws Exception\PackageIsNotInstalled
      */
