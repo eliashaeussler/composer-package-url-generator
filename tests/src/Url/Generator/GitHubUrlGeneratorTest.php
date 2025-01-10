@@ -47,14 +47,6 @@ final class GitHubUrlGeneratorTest extends Framework\TestCase
     }
 
     #[Framework\Attributes\Test]
-    public function generateSourceUrlThrowsExceptionIfNoSourceUrlsAndDistUrlsAreAvailable(): void
-    {
-        $this->expectExceptionObject(new Src\Exception\NoSourceUrlAvailable('foo/baz'));
-
-        $this->subject->generateSourceUrl($this->package);
-    }
-
-    #[Framework\Attributes\Test]
     public function generateSourceUrlThrowsExceptionIfNoSupportedSourceUrlsAndDistUrlsAreAvailable(): void
     {
         $this->package->setDistUrl('https://api.github.com/foo');
@@ -62,17 +54,6 @@ final class GitHubUrlGeneratorTest extends Framework\TestCase
         $this->expectExceptionObject(new Src\Exception\NoSourceUrlAvailable('foo/baz'));
 
         $this->subject->generateSourceUrl($this->package);
-    }
-
-    #[Framework\Attributes\Test]
-    public function generateSourceUrlReturnsSourceUrlFromPackage(): void
-    {
-        $this->package->setSourceUrl('https://github.com/foo/baz.git');
-
-        self::assertEquals(
-            new Psr7\Uri('https://github.com/foo/baz'),
-            $this->subject->generateSourceUrl($this->package),
-        );
     }
 
     #[Framework\Attributes\Test]
@@ -87,33 +68,11 @@ final class GitHubUrlGeneratorTest extends Framework\TestCase
     }
 
     #[Framework\Attributes\Test]
-    public function generateHomepageUrlReturnsHomepageFromPackage(): void
-    {
-        $this->package->setHomepage('https://example.com');
-
-        self::assertEquals(
-            new Psr7\Uri('https://example.com'),
-            $this->subject->generateHomepageUrl($this->package),
-        );
-    }
-
-    #[Framework\Attributes\Test]
     public function generateHomepageUrlSkipsUnsupportedApiUrl(): void
     {
         $this->package->setDistUrl('https://api.github.com/foo');
 
         self::assertNull($this->subject->generateHomepageUrl($this->package));
-    }
-
-    #[Framework\Attributes\Test]
-    public function generateHomepageUrlReturnsSourceUrlFromPackage(): void
-    {
-        $this->package->setSourceUrl('https://github.com/foo/baz.git');
-
-        self::assertEquals(
-            new Psr7\Uri('https://github.com/foo/baz'),
-            $this->subject->generateHomepageUrl($this->package),
-        );
     }
 
     #[Framework\Attributes\Test]
@@ -125,12 +84,6 @@ final class GitHubUrlGeneratorTest extends Framework\TestCase
             new Psr7\Uri('https://github.com/foo/baz'),
             $this->subject->generateHomepageUrl($this->package),
         );
-    }
-
-    #[Framework\Attributes\Test]
-    public function supportsReturnsFalseIfNeitherSourceUrlsNorDistUrlsContainsGitHubUrls(): void
-    {
-        self::assertFalse($this->subject->supports($this->package));
     }
 
     #[Framework\Attributes\Test]

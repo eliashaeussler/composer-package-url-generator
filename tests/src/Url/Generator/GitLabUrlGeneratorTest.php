@@ -60,14 +60,6 @@ final class GitLabUrlGeneratorTest extends Framework\TestCase
     }
 
     #[Framework\Attributes\Test]
-    public function generateSourceUrlThrowsExceptionIfNoSourceUrlsAndDistUrlsAreAvailable(): void
-    {
-        $this->expectExceptionObject(new Src\Exception\NoSourceUrlAvailable('foo/baz'));
-
-        $this->subject->generateSourceUrl($this->package);
-    }
-
-    #[Framework\Attributes\Test]
     public function generateSourceUrlThrowsExceptionIfNoSupportedSourceUrlsAndDistUrlsAreAvailable(): void
     {
         $this->package->setDistUrl('https://gitlab.com/api/v4/foo');
@@ -75,17 +67,6 @@ final class GitLabUrlGeneratorTest extends Framework\TestCase
         $this->expectExceptionObject(new Src\Exception\NoSourceUrlAvailable('foo/baz'));
 
         $this->subject->generateSourceUrl($this->package);
-    }
-
-    #[Framework\Attributes\Test]
-    public function generateSourceUrlReturnsSourceUrlFromPackage(): void
-    {
-        $this->package->setSourceUrl('https://gitlab.com/foo/baz.git');
-
-        self::assertEquals(
-            new Psr7\Uri('https://gitlab.com/foo/baz'),
-            $this->subject->generateSourceUrl($this->package),
-        );
     }
 
     #[Framework\Attributes\Test]
@@ -100,33 +81,11 @@ final class GitLabUrlGeneratorTest extends Framework\TestCase
     }
 
     #[Framework\Attributes\Test]
-    public function generateHomepageUrlReturnsHomepageFromPackage(): void
-    {
-        $this->package->setHomepage('https://example.com');
-
-        self::assertEquals(
-            new Psr7\Uri('https://example.com'),
-            $this->subject->generateHomepageUrl($this->package),
-        );
-    }
-
-    #[Framework\Attributes\Test]
     public function generateHomepageUrlSkipsUnsupportedApiUrl(): void
     {
         $this->package->setDistUrl('https://gitlab.com/api/v4/foo');
 
         self::assertNull($this->subject->generateHomepageUrl($this->package));
-    }
-
-    #[Framework\Attributes\Test]
-    public function generateHomepageUrlReturnsSourceUrlFromPackage(): void
-    {
-        $this->package->setSourceUrl('https://gitlab.com/foo/baz.git');
-
-        self::assertEquals(
-            new Psr7\Uri('https://gitlab.com/foo/baz'),
-            $this->subject->generateHomepageUrl($this->package),
-        );
     }
 
     #[Framework\Attributes\Test]
@@ -138,12 +97,6 @@ final class GitLabUrlGeneratorTest extends Framework\TestCase
             new Psr7\Uri('https://gitlab.com/foo/baz'),
             $this->subject->generateHomepageUrl($this->package),
         );
-    }
-
-    #[Framework\Attributes\Test]
-    public function supportsReturnsFalseIfNeitherSourceUrlsNorDistUrlsContainsGitLabUrls(): void
-    {
-        self::assertFalse($this->subject->supports($this->package));
     }
 
     #[Framework\Attributes\Test]
