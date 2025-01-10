@@ -21,41 +21,39 @@ declare(strict_types=1);
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace EliasHaeussler\ComposerPackageUrlGenerator\Url\Generator;
+namespace EliasHaeussler\ComposerPackageUrlGenerator\Tests\Fixtures;
 
-use GuzzleHttp\Psr7;
+use EliasHaeussler\ComposerPackageUrlGenerator\Url;
 use Psr\Http\Message;
 
-use function preg_match;
-use function sprintf;
-
 /**
- * GitHubUrlGenerator.
+ * DummyVcsUrlGenerator.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class GitHubUrlGenerator extends VcsUrlGenerator
+final class DummyVcsUrlGenerator extends Url\Generator\VcsUrlGenerator
 {
+    public bool $isApiUrl = false;
+    public ?Message\UriInterface $extractedApiUrl = null;
+
+    /**
+     * @var non-empty-array<string>
+     */
+    public array $domains = ['example.com'];
+
     protected function isApiUrl(Message\UriInterface $sourceUrl): bool
     {
-        return 'api.github.com' === $sourceUrl->getHost();
+        return $this->isApiUrl;
     }
 
     protected function extractSourceUrlFromApiUrl(Message\UriInterface $apiUrl): ?Message\UriInterface
     {
-        $path = $apiUrl->getPath();
-
-        if (1 !== preg_match('#/repos/(?<user>[^/]+)/(?<repo>[^/]+)/zipball/.+#', $path, $matches)) {
-            return null;
-        }
-
-        // https://api.github.com/repos/guzzle/psr7/zipball/a70f5c95fb43bc83f07c9c948baa0dc1829bf201 => https://github.com/guzzle/psr7
-        return new Psr7\Uri(sprintf('https://github.com/%s/%s', $matches['user'], $matches['repo']));
+        return $this->extractedApiUrl;
     }
 
     protected function getDomains(): array
     {
-        return ['github.com'];
+        return $this->domains;
     }
 }

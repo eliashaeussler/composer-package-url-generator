@@ -24,15 +24,11 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerPackageUrlGenerator\Url\Generator;
 
 use Composer\Composer;
-use Composer\Package;
-use EliasHaeussler\ComposerPackageUrlGenerator\Exception;
-use EliasHaeussler\ComposerPackageUrlGenerator\Helper;
 use GuzzleHttp\Psr7;
 use Psr\Http\Message;
 
 use function preg_match;
 use function sprintf;
-use function str_contains;
 use function str_replace;
 use function str_starts_with;
 
@@ -42,10 +38,10 @@ use function str_starts_with;
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-final class GitLabUrlGenerator implements UrlGenerator
+final class GitLabUrlGenerator extends VcsUrlGenerator
 {
     /**
-     * @var string[]
+     * @var non-empty-array<string>
      */
     private readonly array $domains;
 
@@ -55,70 +51,12 @@ final class GitLabUrlGenerator implements UrlGenerator
         $this->domains = $composer->getPackage()->getConfig()['gitlab-domains'] ?? ['gitlab.com'];
     }
 
-    /**
-     * @throws Exception\NoSourceUrlAvailable
-     * @throws Exception\UrlIsMalformed
-     */
-    public function generateSourceUrl(Package\PackageInterface $package): Message\UriInterface
+    protected function isApiUrl(Message\UriInterface $sourceUrl): bool
     {
-        $candidates = [];
-        $candidates += $package->getSourceUrls();
-        $candidates += $package->getDistUrls();
-
-        foreach ($candidates as $candidate) {
-            $sourceUrl = Helper\UrlHelper::normalizeUrl($candidate);
-
-            if (str_starts_with($sourceUrl->getPath(), '/api/v4/')) {
-                $sourceUrl = $this->extractSourceUrlFromApiUrl($sourceUrl);
-            }
-
-            if (null !== $sourceUrl) {
-                return $sourceUrl;
-            }
-        }
-
-        throw new Exception\NoSourceUrlAvailable($package->getName());
+        return str_starts_with($sourceUrl->getPath(), '/api/v4/');
     }
 
-    /**
-     * @throws Exception\UrlIsMalformed
-     */
-    public function generateHomepageUrl(Package\PackageInterface $package): ?Message\UriInterface
-    {
-        if ($package instanceof Package\CompletePackageInterface && null !== $package->getHomepage()) {
-            return Helper\UrlHelper::normalizeUrl($package->getHomepage());
-        }
-
-        try {
-            return $this->generateSourceUrl($package);
-        } catch (Exception\NoSourceUrlAvailable) {
-            return null;
-        }
-    }
-
-    public function supports(Package\PackageInterface $package): bool
-    {
-        $candidates = [];
-        $candidates += $package->getSourceUrls();
-        $candidates += $package->getDistUrls();
-
-        foreach ($candidates as $candidate) {
-            foreach ($this->domains as $domain) {
-                if (str_contains($candidate, $domain)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    public static function getPriority(): int
-    {
-        return 100;
-    }
-
-    private function extractSourceUrlFromApiUrl(Message\UriInterface $apiUrl): ?Message\UriInterface
+    protected function extractSourceUrlFromApiUrl(Message\UriInterface $apiUrl): ?Message\UriInterface
     {
         $path = $apiUrl->getPath();
 
@@ -134,5 +72,10 @@ final class GitLabUrlGenerator implements UrlGenerator
                 str_replace('%2F', '/', $matches['namespace']),
             ),
         );
+    }
+
+    protected function getDomains(): array
+    {
+        return $this->domains;
     }
 }
