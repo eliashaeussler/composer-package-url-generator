@@ -25,25 +25,38 @@ namespace EliasHaeussler\ComposerPackageUrlGenerator\Tests\Url\Generator;
 
 use Composer\Package;
 use EliasHaeussler\ComposerPackageUrlGenerator as Src;
+use EliasHaeussler\ComposerPackageUrlGenerator\Tests;
 use GuzzleHttp\Psr7;
 use PHPUnit\Framework;
 
 /**
- * GitHubUrlGeneratorTest.
+ * GitLabUrlGeneratorTest.
  *
  * @author Elias Häußler <elias@haeussler.dev>
  * @license GPL-3.0-or-later
  */
-#[Framework\Attributes\CoversClass(Src\Url\Generator\GitHubUrlGenerator::class)]
-final class GitHubUrlGeneratorTest extends Framework\TestCase
+#[Framework\Attributes\CoversClass(Src\Url\Generator\GitLabUrlGenerator::class)]
+final class GitLabUrlGeneratorTest extends Framework\TestCase
 {
-    private Src\Url\Generator\GitHubUrlGenerator $subject;
+    use Tests\ComposerTrait;
+
     private Package\CompletePackage $package;
+    private Src\Url\Generator\GitLabUrlGenerator $subject;
 
     public function setUp(): void
     {
-        $this->subject = new Src\Url\Generator\GitHubUrlGenerator();
-        $this->package = new Package\CompletePackage('foo/baz', '1.0.0', '1.0.0');
+        $this->package = new Package\RootPackage('foo/baz', '1.0.0', '1.0.0');
+        $this->package->setConfig([
+            'gitlab-domains' => [
+                'gitlab.com',
+                'gitlab.example.com',
+            ],
+        ]);
+
+        $composer = self::getComposer();
+        $composer->setPackage($this->package);
+
+        $this->subject = new Src\Url\Generator\GitLabUrlGenerator($composer);
     }
 
     #[Framework\Attributes\Test]
@@ -57,7 +70,7 @@ final class GitHubUrlGeneratorTest extends Framework\TestCase
     #[Framework\Attributes\Test]
     public function generateSourceUrlThrowsExceptionIfNoSupportedSourceUrlsAndDistUrlsAreAvailable(): void
     {
-        $this->package->setDistUrl('https://api.github.com/foo');
+        $this->package->setDistUrl('https://gitlab.com/api/v4/foo');
 
         $this->expectExceptionObject(new Src\Exception\NoSourceUrlAvailable('foo/baz'));
 
@@ -67,10 +80,10 @@ final class GitHubUrlGeneratorTest extends Framework\TestCase
     #[Framework\Attributes\Test]
     public function generateSourceUrlReturnsSourceUrlFromPackage(): void
     {
-        $this->package->setSourceUrl('https://github.com/foo/baz.git');
+        $this->package->setSourceUrl('https://gitlab.com/foo/baz.git');
 
         self::assertEquals(
-            new Psr7\Uri('https://github.com/foo/baz'),
+            new Psr7\Uri('https://gitlab.com/foo/baz'),
             $this->subject->generateSourceUrl($this->package),
         );
     }
@@ -78,10 +91,10 @@ final class GitHubUrlGeneratorTest extends Framework\TestCase
     #[Framework\Attributes\Test]
     public function generateSourceUrlExtractsSourceUrlFromApiUrl(): void
     {
-        $this->package->setDistUrl('https://api.github.com/repos/foo/baz/zipball/a70f5c95fb43bc83f07c9c948baa0dc1829bf201');
+        $this->package->setDistUrl('https://gitlab.com/api/v4/projects/foo%2Fbaz/repository/archive.zip?sha=b9a16c6d0bc4f591d631a6ceb3c320859ce811c2');
 
         self::assertEquals(
-            new Psr7\Uri('https://github.com/foo/baz'),
+            new Psr7\Uri('https://gitlab.com/foo/baz'),
             $this->subject->generateSourceUrl($this->package),
         );
     }
@@ -100,7 +113,7 @@ final class GitHubUrlGeneratorTest extends Framework\TestCase
     #[Framework\Attributes\Test]
     public function generateHomepageUrlSkipsUnsupportedApiUrl(): void
     {
-        $this->package->setDistUrl('https://api.github.com/foo');
+        $this->package->setDistUrl('https://gitlab.com/api/v4/foo');
 
         self::assertNull($this->subject->generateHomepageUrl($this->package));
     }
@@ -108,10 +121,10 @@ final class GitHubUrlGeneratorTest extends Framework\TestCase
     #[Framework\Attributes\Test]
     public function generateHomepageUrlReturnsSourceUrlFromPackage(): void
     {
-        $this->package->setSourceUrl('https://github.com/foo/baz.git');
+        $this->package->setSourceUrl('https://gitlab.com/foo/baz.git');
 
         self::assertEquals(
-            new Psr7\Uri('https://github.com/foo/baz'),
+            new Psr7\Uri('https://gitlab.com/foo/baz'),
             $this->subject->generateHomepageUrl($this->package),
         );
     }
@@ -119,32 +132,48 @@ final class GitHubUrlGeneratorTest extends Framework\TestCase
     #[Framework\Attributes\Test]
     public function generateHomepageUrlExtractsSourceUrlFromApiUrl(): void
     {
-        $this->package->setDistUrl('https://api.github.com/repos/foo/baz/zipball/a70f5c95fb43bc83f07c9c948baa0dc1829bf201');
+        $this->package->setDistUrl('https://gitlab.com/api/v4/projects/foo%2Fbaz/repository/archive.zip?sha=b9a16c6d0bc4f591d631a6ceb3c320859ce811c2');
 
         self::assertEquals(
-            new Psr7\Uri('https://github.com/foo/baz'),
+            new Psr7\Uri('https://gitlab.com/foo/baz'),
             $this->subject->generateHomepageUrl($this->package),
         );
     }
 
     #[Framework\Attributes\Test]
-    public function supportsReturnsFalseIfNeitherSourceUrlsNorDistUrlsContainsGitHubUrls(): void
+    public function supportsReturnsFalseIfNeitherSourceUrlsNorDistUrlsContainsGitLabUrls(): void
     {
         self::assertFalse($this->subject->supports($this->package));
     }
 
     #[Framework\Attributes\Test]
-    public function supportsReturnsTrueIfAnySourceUrlContainsGitHubUrl(): void
+    public function supportsReturnsTrueIfAnySourceUrlContainsDefaultGitLabUrl(): void
     {
-        $this->package->setSourceUrl('https://github.com/foo/baz.git');
+        $this->package->setSourceUrl('https://gitlab.com/foo/baz.git');
 
         self::assertTrue($this->subject->supports($this->package));
     }
 
     #[Framework\Attributes\Test]
-    public function supportsReturnsTrueIfAnyDistUrlContainsGitHubUrl(): void
+    public function supportsReturnsTrueIfAnySourceUrlContainsConfiguredGitLabUrl(): void
     {
-        $this->package->setDistUrl('https://api.github.com/repos/foo/baz/zipball/a70f5c95fb43bc83f07c9c948baa0dc1829bf201');
+        $this->package->setSourceUrl('https://gitlab.example.com/foo/baz.git');
+
+        self::assertTrue($this->subject->supports($this->package));
+    }
+
+    #[Framework\Attributes\Test]
+    public function supportsReturnsTrueIfAnyDistUrlContainsDefaultGitLabUrl(): void
+    {
+        $this->package->setDistUrl('https://gitlab.com/api/v4/projects/foo%2Fbaz/repository/archive.zip?sha=b9a16c6d0bc4f591d631a6ceb3c320859ce811c2');
+
+        self::assertTrue($this->subject->supports($this->package));
+    }
+
+    #[Framework\Attributes\Test]
+    public function supportsReturnsTrueIfAnyDistUrlContainsConfiguredGitLabUrl(): void
+    {
+        $this->package->setDistUrl('https://gitlab.example.com/api/v4/projects/foo%2Fbaz/repository/archive.zip?sha=b9a16c6d0bc4f591d631a6ceb3c320859ce811c2');
 
         self::assertTrue($this->subject->supports($this->package));
     }
