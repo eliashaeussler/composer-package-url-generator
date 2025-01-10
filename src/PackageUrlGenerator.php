@@ -64,6 +64,7 @@ final class PackageUrlGenerator
         $urlGenerators = [
             new Url\Generator\GenericUrlGenerator(),
             new Url\Generator\GitHubUrlGenerator(),
+            new Url\Generator\GitLabUrlGenerator($composer),
         ];
 
         return new self($composer, $urlGenerators);

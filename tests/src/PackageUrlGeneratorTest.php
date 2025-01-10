@@ -24,8 +24,6 @@ declare(strict_types=1);
 namespace EliasHaeussler\ComposerPackageUrlGenerator\Tests;
 
 use Composer\Composer;
-use Composer\Factory;
-use Composer\IO;
 use Composer\Package;
 use Composer\Semver;
 use EliasHaeussler\ComposerPackageUrlGenerator as Src;
@@ -42,6 +40,8 @@ use PHPUnit\Framework;
 #[Framework\Attributes\CoversClass(Src\PackageUrlGenerator::class)]
 final class PackageUrlGeneratorTest extends Framework\TestCase
 {
+    use ComposerTrait;
+
     private Composer $composer;
     private Src\PackageUrlGenerator $subject;
 
@@ -131,10 +131,5 @@ final class PackageUrlGeneratorTest extends Framework\TestCase
         self::assertInstanceOf(Package\PackageInterface::class, $package);
 
         return $package;
-    }
-
-    private static function getComposer(): Composer
-    {
-        return Factory::create(new IO\NullIO());
     }
 }
