@@ -47,8 +47,14 @@ final class GitLabUrlGenerator extends VcsUrlGenerator
 
     public function __construct(Composer $composer)
     {
-        /* @phpstan-ignore assign.propertyType */
-        $this->domains = $composer->getPackage()->getConfig()['gitlab-domains'] ?? ['gitlab.com'];
+        /** @var array<string> $domains */
+        $domains = $composer->getPackage()->getConfig()['gitlab-domains'] ?? [];
+
+        if ([] === $domains) {
+            $domains = ['gitlab.com'];
+        }
+
+        $this->domains = $domains;
     }
 
     protected function isApiUrl(Message\UriInterface $sourceUrl): bool
